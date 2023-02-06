@@ -15,8 +15,8 @@ import org.apache.lucene.search.TopDocs;
 public class AgentTwo extends Agent {
   private static final long serialVersionUID = 1L;
   
-  String indexDir = "C:\\Users\\HP\\Documents\\INDEX";                        /*c:\\Lucene\\Index";*/
-  String dataDir =   "C:\\Users\\HP\\Documents\\JAVA\\1. Course Introduction";                                                       /*"c:\\Lucene\\Data";*/
+  String indexDir = "C:\\Users\\HP\\Documents\\INDEX";
+  String dataDir =   "C:\\Users\\HP\\Documents";                           
   indexer indexer;
   searcher searcher;
   
