@@ -27,12 +27,12 @@ public class indexer {
 	         FSDirectory.open(new File(indexDirectoryPath));
 
 	      //create the indexer
-	      /*writer = new IndexWriter(indexDirectory, 
+	      writer = new IndexWriter(indexDirectory, 
 	         new StandardAnalyzer(Version.LUCENE_36),true, 
-	         IndexWriter.MaxFieldLength.UNLIMITED);*/
-	      Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_36);
+	         IndexWriter.MaxFieldLength.UNLIMITED);
+	      /*Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_36);
 	      IndexWriterConfig iwc = new IndexWriterConfig(null, analyzer);
-	      writer = new IndexWriter(indexDirectory, iwc);
+	      writer = new IndexWriter(indexDirectory, iwc);*/
 	   }
 	   public void close() throws CorruptIndexException, IOException {
 		      writer.close();
