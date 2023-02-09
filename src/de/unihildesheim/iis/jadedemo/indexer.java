@@ -65,18 +65,25 @@ public class indexer {
 		   public int createIndex(String dataDirPath, FileFilter filter) 
 		      throws IOException {
 		      //get all files in the data directory
-		      File[] files = new File(dataDirPath).listFiles();
-
-		      for (File file : files) {
-		         if(!file.isDirectory()
-		            && !file.isHidden()
-		            && file.exists()
-		            && file.canRead()
-		            && filter.accept(file)
-		         ){
-		            indexFile(file);
-		         }
-		      }
+		      File directory = new File(dataDirPath);
+		      if (directory.isDirectory()) {
+		    	  File[] files = directory.listFiles();
+		    	  for (File file : files) {
+		    	    if (file.isDirectory()) {
+		    	      System.out.println("It contains a directory: " + file.getName());
+		    	    }
+		    	    else if(!file.isDirectory()
+				            && !file.isHidden()
+				            && file.exists()
+				            && file.canRead()
+				            && filter.accept(file)
+		    	    		){
+			            indexFile(file);
+			         }
+		    	  }
+		    	} else {
+		    	  System.out.println("It's not a directory");
+		    	}
 		      return writer.numDocs();
 		   }
 	
