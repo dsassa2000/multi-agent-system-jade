@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Stack;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -62,30 +63,31 @@ public class indexer {
 		      writer.addDocument(document);
 		   }
 
-		   public int createIndex(String dataDirPath, FileFilter filter) 
-		      throws IOException {
-		      //get all files in the data directory
-		      File directory = new File(dataDirPath);
-		      if (directory.isDirectory()) {
-		    	  File[] files = directory.listFiles();
-		    	  for (File file : files) {
-		    	    if (file.isDirectory()) {
-		    	      System.out.println("It contains a directory: " + file.getName());
-		    	    }
-		    	    else if(!file.isDirectory()
-				            && !file.isHidden()
-				            && file.exists()
-				            && file.canRead()
-				            && filter.accept(file)
-		    	    		){
-			            indexFile(file);
-			         }
-		    	  }
-		    	} else {
-		    	  System.out.println("It's not a directory");
-		    	}
-		      return writer.numDocs();
-		   }
+		   public int RecursiveCreateIndex(File[] arr, int level,FileFilter filter) throws IOException
+		    {
+		        // for-each loop for main directory files
+		        for (File f : arr) {
+		            // tabs for internal levels
+		            for (int i = 0; i < level; i++)
+		                System.out.print("\t");
+		 
+		            if (f.isFile()&& !f.isHidden()
+				            && f.exists()
+				            && f.canRead()
+				            && filter.accept(f)) {
+		                System.out.println(f.getName());
+		                indexFile(f);
+		            }
+		 
+		            else if (f.isDirectory()) {
+		                System.out.println("[" + f.getName() + "]");
+		 
+		                // recursion for sub-directories
+		                RecursiveCreateIndex(f.listFiles(), level + 1,filter);
+		            }
+		        }
+		        return writer.numDocs();
+		    }
 	
 	
 }
