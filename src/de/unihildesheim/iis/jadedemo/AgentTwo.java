@@ -5,6 +5,7 @@ import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.apache.lucene.document.Document;
@@ -16,7 +17,7 @@ public class AgentTwo extends Agent {
   private static final long serialVersionUID = 1L;
   
   String indexDir = "C:\\Users\\HP\\Documents\\INDEX";
-  String dataDir =   "C:\\Users\\HP\\Documents";                           
+  String dataDir =   "C:\\Users\\HP\\Documents\\JAVA";                           
   indexer indexer;
   searcher searcher;
   
@@ -25,11 +26,28 @@ public class AgentTwo extends Agent {
       indexer = new indexer(indexDir);
       int numIndexed;
       long startTime = System.currentTimeMillis();	
-      numIndexed = indexer.createIndex(dataDir, new textFileFilter());
-      long endTime = System.currentTimeMillis();
-      indexer.close();
-      System.out.println(numIndexed+" File indexed, time taken: "
-         +(endTime-startTime)+" ms");		
+      long endTime = System.currentTimeMillis();      
+   // File object
+      File maindir = new File(dataDir);
+
+      if (maindir.exists() && maindir.isDirectory()) {
+          // array for files and sub-directories
+          // of directory pointed by maindir
+          File arr[] = maindir.listFiles();
+
+          System.out.println(
+              "**********************************************");
+          System.out.println(
+              "Files from main directory : " + maindir);
+          System.out.println(
+              "**********************************************");
+
+          // Calling recursive method
+          numIndexed = indexer.RecursiveCreateIndex(arr, 0,new textFileFilter());
+          indexer.close();
+          System.out.println(numIndexed+" File indexed, time taken: "
+             +(endTime-startTime)+" ms");
+      }
    }
   // searching 
   private void search(String searchQuery) throws IOException, ParseException {
