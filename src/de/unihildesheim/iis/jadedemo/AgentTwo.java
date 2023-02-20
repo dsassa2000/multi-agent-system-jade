@@ -60,8 +60,7 @@ public class AgentTwo extends Agent {
          " documents found. Time :" + (endTime - startTime));
       for(ScoreDoc scoreDoc : hits.scoreDocs) {
          Document doc = searcher.getDocument(scoreDoc);
-            System.out.println("File: "
-            + doc.get(LuceneConstants.FILE_PATH));
+         GUIinterface.updateUI(doc.get(LuceneConstants.FILE_PATH));
       }
       searcher.close();
    }
