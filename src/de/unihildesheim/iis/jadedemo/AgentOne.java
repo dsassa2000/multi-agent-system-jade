@@ -5,6 +5,9 @@ import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.wrapper.StaleProxyException;
+import javafx.application.Application;
+import javafx.application.Platform;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -16,17 +19,20 @@ import java.io.InputStreamReader;
  */
 public class AgentOne extends Agent {
   private static final long serialVersionUID = 1L;
+  private ACLMessage message;
+
+  public AgentOne(ACLMessage message) {
+      this.message = message;
+  }
 
   protected void setup() {
-
+    send(message);
     // Define the behaviour
     CyclicBehaviour loop = new CyclicBehaviour(this) {
       private static final long serialVersionUID = 1L;
-
+     
       @Override
       public void action() {
-
-        // Receive the incoming message
         ACLMessage aclMsg = receive();
 
         // Interpret the message
@@ -35,37 +41,12 @@ public class AgentOne extends Agent {
           System.out
               .println(myAgent.getLocalName() + "> Received message from: " + aclMsg.getSender());
           System.out.println("Received solution: " + aclMsg.getContent());
+          ACLMessage newMsg = new ACLMessage(ACLMessage.REQUEST);
+          newMsg.addReceiver(new AID("AgentTwo", AID.ISLOCALNAME));
+          newMsg.setContent(aclMsg.getContent());
+          send(newMsg);
         }
 
-        System.out.println("Enter the task:");
-        // Read the task from command line
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-        String in;
-        try {
-          in = reader.readLine();
-          if (!in.equals("stop")) {
-            System.out.println("Assigning task ...");
-            ACLMessage newMsg = new ACLMessage(ACLMessage.REQUEST);
-            newMsg.addReceiver(new AID("AgentTwo", AID.ISLOCALNAME));
-            newMsg.setContent(in);
-            send(newMsg);
-          } else {
-            System.out.println("Stopping ...");
-            // Shut down main container
-            Thread stopContainer = new Thread(() -> {
-              try {
-                getContainerController().kill();
-              } catch (StaleProxyException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-              }
-            });
-            stopContainer.start();
-          }
-        } catch (IOException e) {
-          // TODO Auto-generated catch block
-          e.printStackTrace();
-        }
         block(); // Stop the behaviour until next message is received
       }
     };
