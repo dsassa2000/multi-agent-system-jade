@@ -7,12 +7,12 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.GridPane;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
+import javafx.scene.layout.VBox;
+import javafx.scene.shape.Polygon;
 import javafx.stage.Stage;
 import jade.core.AID;
 import jade.core.Profile;
@@ -24,7 +24,8 @@ import jade.wrapper.AgentController;
 import jade.wrapper.StaleProxyException;
 
 public class GUIinterface extends Application {
-    private TextField queryTextField = new TextField();
+    private TextField searchField = new TextField();
+    private TextField pathField = new TextField();
     private String sentQuery;
     private static Label messageLabel;
     // creating agent variable
@@ -34,47 +35,67 @@ public class GUIinterface extends Application {
     AgentController agentTwo;
     //
 	@Override
-	public void start(Stage arg0) {
-			// TODO Auto-generated method stub
-			arg0.setTitle("JavaFX Welcome");
-			GridPane grid = new GridPane();
-			grid.setAlignment(Pos.CENTER);
-			grid.setHgap(10);
-			grid.setVgap(10);
-			grid.setPadding(new Insets(25, 25, 25, 25));
+	public void start(Stage stage) {
+		// Load the search icon image
+        Image searchIcon = new Image("C:\\Users\\HP\\Downloads\\search.png");
 
-			Scene scene = new Scene(grid, 300, 275);
-			arg0.setScene(scene);
-			Text scenetitle = new Text("Welcome");
-			scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
-			grid.add(scenetitle, 0, 0, 2, 1);
+        // Create an ImageView for the search icon
+        ImageView iconView = new ImageView(searchIcon);
+        iconView.setFitHeight(20);
+        iconView.setFitWidth(20);
+		// Create a label and a text field for the search bar
+        searchField = new TextField();
+        searchField.setPromptText("Search");
+        pathField = new TextField();
+        Button searchButton = new Button("Search");
+        searchButton.setGraphic(iconView);
+     // Set the width and height of the ImageView
+        iconView.setFitWidth(10);
+        iconView.setFitHeight(10);
+     // Add an event handler to the search button to perform the search
+        searchButton.setOnAction(event -> 
+        {
+			try {
+				sendQuery();
+			} catch (StaleProxyException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		});
+        Arrow leftArrow = new Arrow(ArrowType.LEFT);
+        Arrow rightArrow = new Arrow(ArrowType.RIGHT);
 
-			Label userName = new Label("Input a query:");
-			grid.add(userName, 0, 1);
+        Button leftButton = new Button();
+        leftButton.setGraphic(new StackPane(leftArrow));
+        leftButton.setOnAction(e -> System.out.println("Left button clicked"));
 
-			grid.add(queryTextField, 1, 1);
-			// Create a button
-	        Button button = new Button("Search");
-	    	HBox hbBtn = new HBox(10);
-			hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
-			hbBtn.getChildren().add(button);
-			grid.add(hbBtn, 1, 4);
-	        button.setOnAction(e -> {
-	        	try {
-					sendQuery();
-				} catch (StaleProxyException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-			});
-	        messageLabel = new Label("No message yet");
+        Button rightButton = new Button();
+        rightButton.setGraphic(new StackPane(rightArrow));
+        rightButton.setOnAction(e -> System.out.println("Right button clicked"));
+
+        // Create a layout for the search bar and add the label, text field, and button to it
+        HBox searchBar = new HBox(10);
+        searchBar.setPadding(new Insets(10));
+        searchBar.getChildren().addAll(leftButton,rightButton,pathField, searchField, searchButton);
+
+        // Create a layout for the scene and add the search bar to it
+        VBox layout = new VBox(10);
+        layout.setPadding(new Insets(10));
+        layout.getChildren().add(searchBar);
+
+        // Create a scene and add the layout to it
+        Scene scene = new Scene(layout);
+
+        // Set the stage title and scene, then show the stage
+        stage.setTitle("Search Bar Example");
+        stage.setScene(scene);
+        stage.show();
 			
-			arg0.show();
 
 	}
     
 	    public void sendQuery() throws StaleProxyException{
-	        String query = queryTextField.getText();
+	        String query = searchField.getText();
 	        runtime = jade.core.Runtime.instance();
 	        runtime.setCloseVM(true);
 
@@ -94,7 +115,34 @@ public class GUIinterface extends Application {
 	    }
 	    public static void updateUI(String message) {
 	        System.out.println(message);
-	        messageLabel.setText(message);
+	       // messageLabel.setText(message);
 	    }
+
+	    private static class Arrow extends Polygon {
+	        public Arrow(ArrowType type) {
+	            if (type == ArrowType.LEFT) {
+	                getPoints().addAll(new Double[]{
+	                    15.0, 0.0,
+	                    0.0, 10.0,
+	                    15.0, 20.0,
+	                    15.0, 15.0,
+	                    5.0, 10.0,
+	                    15.0, 5.0});
+	            } else if (type == ArrowType.RIGHT) {
+	                getPoints().addAll(new Double[]{
+	                    0.0, 0.0,
+	                    15.0, 10.0,
+	                    0.0, 20.0,
+	                    0.0, 15.0,
+	                    10.0, 10.0,
+	                    0.0, 5.0});
+	            }
+	        }
+	    }
+
+	    private enum ArrowType {
+	        LEFT, RIGHT
+	    }
+
 
 }
