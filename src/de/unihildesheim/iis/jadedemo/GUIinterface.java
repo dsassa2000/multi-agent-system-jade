@@ -14,6 +14,13 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Polygon;
 import javafx.stage.Stage;
+
+import java.io.IOException;
+import java.util.Dictionary;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Map;
+
 import jade.core.AID;
 import jade.core.Profile;
 import jade.core.ProfileImpl;
@@ -41,8 +48,8 @@ public class GUIinterface extends Application {
 
         // Create an ImageView for the search icon
         ImageView iconView = new ImageView(searchIcon);
-        iconView.setFitHeight(20);
-        iconView.setFitWidth(20);
+        iconView.setFitHeight(30);
+        iconView.setFitWidth(30);
 		// Create a label and a text field for the search bar
         searchField = new TextField();
         searchField.setPromptText("Search");
@@ -56,7 +63,12 @@ public class GUIinterface extends Application {
         searchButton.setOnAction(event -> 
         {
 			try {
-				sendQuery();
+				try {
+					sendQuery();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			} catch (StaleProxyException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -94,8 +106,10 @@ public class GUIinterface extends Application {
 
 	}
     
-	    public void sendQuery() throws StaleProxyException{
+	    public void sendQuery() throws StaleProxyException, IOException{
 	        String query = searchField.getText();
+	        String path = pathField.getText();
+	        Object object = new Object(path,query);
 	        runtime = jade.core.Runtime.instance();
 	        runtime.setCloseVM(true);
 
@@ -104,13 +118,13 @@ public class GUIinterface extends Application {
 
 	        mainContainer = runtime.createMainContainer(profile);
 
-	        agentTwo = mainContainer
-	            .createNewAgent("AgentTwo", AgentTwo.class.getName(), new Object[0]);
+	       agentTwo = mainContainer
+	           .createNewAgent("AgentTwo", AgentTwo.class.getName(), new Object[0]);
 	        agentTwo.start();
-	        ACLMessage message = new ACLMessage(ACLMessage.INFORM);
-	        message.setContent(query);
-	        message.addReceiver(new AID("AgentOne", AID.ISLOCALNAME));
-	        mainContainer.acceptNewAgent("AgentOne", new AgentOne(message)).start();
+	        ACLMessage messageToAgentOne = new ACLMessage(ACLMessage.INFORM);
+	        messageToAgentOne.setContentObject(object);
+	        messageToAgentOne.addReceiver(new AID("AgentOne", AID.ISLOCALNAME));
+	        mainContainer.acceptNewAgent("AgentOne", new AgentOne(messageToAgentOne)).start();
 	       
 	    }
 	    public static void updateUI(String message) {
