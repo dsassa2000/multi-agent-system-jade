@@ -1,24 +1,37 @@
 package de.unihildesheim.iis.jadedemo;
 
 import javafx.application.Application;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Polygon;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 
 import jade.core.AID;
@@ -31,10 +44,10 @@ import jade.wrapper.AgentController;
 import jade.wrapper.StaleProxyException;
 
 public class GUIinterface extends Application {
-    private TextField searchField = new TextField();
+    private static TextField searchField = new TextField();
     private TextField pathField = new TextField();
-    private String sentQuery;
-    private static Label messageLabel;
+    static ListView<String> resultTable;
+    private static Button searchButton; 
     // creating agent variable
     Runtime runtime;
     Profile profile;
@@ -52,13 +65,16 @@ public class GUIinterface extends Application {
         iconView.setFitWidth(30);
 		// Create a label and a text field for the search bar
         searchField = new TextField();
-        searchField.setPromptText("Search");
+        searchField.setPromptText("Search...");
         pathField = new TextField();
-        Button searchButton = new Button("Search");
+        pathField.setPromptText("Enter path");
+        searchButton = new Button("Search");
         searchButton.setGraphic(iconView);
      // Set the width and height of the ImageView
         iconView.setFitWidth(10);
         iconView.setFitHeight(10);
+        
+        
      // Add an event handler to the search button to perform the search
         searchButton.setOnAction(event -> 
         {
@@ -89,11 +105,14 @@ public class GUIinterface extends Application {
         HBox searchBar = new HBox(10);
         searchBar.setPadding(new Insets(10));
         searchBar.getChildren().addAll(leftButton,rightButton,pathField, searchField, searchButton);
-
         // Create a layout for the scene and add the search bar to it
         VBox layout = new VBox(10);
         layout.setPadding(new Insets(10));
         layout.getChildren().add(searchBar);
+        
+        resultTable = new ListView<>();
+ 
+        layout.getChildren().add(resultTable);
 
         // Create a scene and add the layout to it
         Scene scene = new Scene(layout);
@@ -125,11 +144,15 @@ public class GUIinterface extends Application {
 	        messageToAgentOne.setContentObject(object);
 	        messageToAgentOne.addReceiver(new AID("AgentOne", AID.ISLOCALNAME));
 	        mainContainer.acceptNewAgent("AgentOne", new AgentOne(messageToAgentOne)).start();
-	       
+	        	       
 	    }
-	    public static void updateUI(String message) {
-	        System.out.println(message);
-	       // messageLabel.setText(message);
+
+	    public static void updateUI(List<String> listResult) {
+	        ObservableList<String> searchResults = FXCollections.observableArrayList();
+	    	System.out.println(searchResults);
+	    	searchResults.clear();
+			searchResults.addAll(listResult);
+			resultTable.setItems(searchResults);
 	    }
 
 	    private static class Arrow extends Polygon {
