@@ -4,6 +4,7 @@ import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
+import jade.lang.acl.UnreadableException;
 import jade.wrapper.StaleProxyException;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -11,6 +12,7 @@ import javafx.application.Platform;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.Serializable;
 
 /**
  * Jade Agent template
@@ -38,13 +40,24 @@ public class AgentOne extends Agent {
         // Interpret the message
         if (aclMsg != null) {
           // do something
-          System.out
-              .println(myAgent.getLocalName() + "> Received message from: " + aclMsg.getSender());
-          System.out.println("Received solution: " + aclMsg.getContent());
-          ACLMessage newMsg = new ACLMessage(ACLMessage.REQUEST);
-          newMsg.addReceiver(new AID("AgentTwo", AID.ISLOCALNAME));
-          newMsg.setContent(aclMsg.getContent());
-          send(newMsg);
+        	try {
+                Serializable content = aclMsg.getContentObject();
+                if (content instanceof Object) {
+                    Object myObject = (Object) content;
+                    // do something with myObject
+                    ACLMessage newMsg = new ACLMessage(ACLMessage.REQUEST);
+                    newMsg.addReceiver(new AID("AgentTwo", AID.ISLOCALNAME));
+                    try {
+						newMsg.setContentObject(myObject);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+                    send(newMsg);
+                }
+            } catch (UnreadableException e) {
+                // handle the exception
+            }
         }
 
         block(); // Stop the behaviour until next message is received
