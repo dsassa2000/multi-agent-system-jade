@@ -20,6 +20,7 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.Polygon;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -44,6 +45,7 @@ import jade.wrapper.AgentController;
 import jade.wrapper.StaleProxyException;
 
 public class GUIinterface extends Application {
+	
     private static TextField searchField = new TextField();
     private TextField pathField = new TextField();
     static ListView<String> resultTable;
@@ -70,12 +72,12 @@ public class GUIinterface extends Application {
         pathField.setPromptText("Enter path");
         searchButton = new Button("Search");
         searchButton.setGraphic(iconView);
-     // Set the width and height of the ImageView
+       // Set the width and height of the ImageView
         iconView.setFitWidth(10);
         iconView.setFitHeight(10);
         
         
-     // Add an event handler to the search button to perform the search
+       // Add an event handler to the search button to perform the search
         searchButton.setOnAction(event -> 
         {
 			try {
@@ -95,11 +97,17 @@ public class GUIinterface extends Application {
 
         Button leftButton = new Button();
         leftButton.setGraphic(new StackPane(leftArrow));
-        leftButton.setOnAction(e -> System.out.println("Left button clicked"));
+        leftButton.setOnAction(e -> {
+        System.out.println("Left button clicked");
+        resultTable.scrollTo(0);
+        });
 
         Button rightButton = new Button();
         rightButton.setGraphic(new StackPane(rightArrow));
-        rightButton.setOnAction(e -> System.out.println("Right button clicked"));
+        rightButton.setOnAction(e -> {
+	        System.out.println("Right button clicked");
+	        resultTable.scrollTo(resultTable.getItems().size() - 1);
+        });
 
         // Create a layout for the search bar and add the label, text field, and button to it
         HBox searchBar = new HBox(10);
