@@ -4,9 +4,11 @@ import jade.core.Agent;
 
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
+import jade.lang.acl.UnreadableException;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.queryParser.ParseException;
@@ -16,13 +18,12 @@ import org.apache.lucene.search.TopDocs;
 public class AgentTwo extends Agent {
   private static final long serialVersionUID = 1L;
   
-  String indexDir = "C:\\Users\\HP\\Documents\\INDEX";
-  String dataDir =   "C:\\Users\\HP\\Documents\\JAVA";                           
+  String indexDir = "C:\\Users\\HP\\Documents\\INDEX";                           
   indexer indexer;
   searcher searcher;
   
   // create indexing
-  private void createIndex() throws IOException {
+  private void createIndex(String dataDir) throws IOException {
       indexer = new indexer(indexDir);
       int numIndexed;
       long startTime = System.currentTimeMillis();	
@@ -65,9 +66,7 @@ public class AgentTwo extends Agent {
       searcher.close();
    }
 
-
   public void setup() {
-
     // Define the behaviour
     CyclicBehaviour loop = new CyclicBehaviour(this) {
       private static final long serialVersionUID = 1L;
@@ -77,23 +76,25 @@ public class AgentTwo extends Agent {
           
         // Receive the incoming message
         ACLMessage aclMsg = receive();
-          
-        // Interpret the message
         if (aclMsg != null) {
-          System.out.println(myAgent.getLocalName()
-              + "> Received message from: " + aclMsg.getSender());
-          System.out.println("Message content: " + aclMsg.getContent());
-          // TODO Aufgabe 1
-          try {
-        	  createIndex();
-        	  search(aclMsg.getContent());
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}catch (ParseException e) {
-	         e.printStackTrace();
-	     }
-          // searching word
+            try {
+                Serializable content = aclMsg.getContentObject();
+                if (content instanceof Object) {
+                    Object myObject = (Object) content;
+                    // do something with myObject
+                    try {
+                  	  createIndex(myObject.getPath()); //C:\\Users\\HP\\Documents\\JAVA
+                  	  search(myObject.getQuery());
+          		} catch (IOException e) {
+          			// TODO Auto-generated catch block
+          			e.printStackTrace();
+          		}catch (ParseException e) {
+          	         e.printStackTrace();
+          	     }
+                }
+            } catch (UnreadableException e) {
+                // handle the exception
+            }
         }
         block(); // Stop the behaviour until next message is received
       }
