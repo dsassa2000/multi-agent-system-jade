@@ -9,6 +9,8 @@ import jade.lang.acl.UnreadableException;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.queryParser.ParseException;
@@ -53,16 +55,19 @@ public class AgentTwo extends Agent {
   // searching 
   private void search(String searchQuery) throws IOException, ParseException {
       searcher = new searcher(indexDir);
+      List<String> myList = new ArrayList<String>();
       long startTime = System.currentTimeMillis();
       TopDocs hits = searcher.search(searchQuery);
       long endTime = System.currentTimeMillis();
-   
+     
       System.out.println(hits.totalHits +
          " documents found. Time :" + (endTime - startTime));
       for(ScoreDoc scoreDoc : hits.scoreDocs) {
          Document doc = searcher.getDocument(scoreDoc);
-         GUIinterface.updateUI(doc.get(LuceneConstants.FILE_PATH));
+         myList.add(doc.get(LuceneConstants.FILE_PATH));
       }
+      GUIinterface.updateUI(myList);
+      
       searcher.close();
    }
 
